@@ -23,14 +23,15 @@ COLORS = {
     7: (0, 128, 255),     # Orange
 }
 
-def load_model(model_path: str | Path) -> YOLO:
-    model_path = Path(model_path)
+def load_model(model_path):
+    url = "https://drive.google.com/uc?export=download&id=13xdczmFe4pnw8r8IKm2EITjA1oyZKdXK"  # your direct link
     if not model_path.exists():
-        import urllib.request
-        url = os.environ["MODEL_URL"]
-        print(f"Downloading model from {url} …")
-        urllib.request.urlretrieve(url, model_path)
-    return YOLO(str(model_path), task="segment")
+        print("Downloading model from", url)
+        response = requests.get(url)
+        model_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(model_path, "wb") as f:
+            f.write(response.content)
+    return onnxruntime.InferenceSession(str(model_path))
 
 def draw_polygon_and_labels(image, masks, classes):
     defect_counts = defaultdict(int)
