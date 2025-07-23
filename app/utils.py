@@ -1,10 +1,11 @@
-import io, os, cv2, numpy as np
-from ultralytics import YOLO
-from fastapi.responses import StreamingResponse
+import os
+import cv2
+import numpy as np
+import requests
+import onnxruntime
 from pathlib import Path
-from typing import List
-from datetime import datetime
 from collections import defaultdict
+from datetime import datetime
 
 IM_SIZE = 640
 CLASSES = {
@@ -24,7 +25,7 @@ COLORS = {
 }
 
 def load_model(model_path):
-    url = "https://drive.google.com/uc?export=download&id=13xdczmFe4pnw8r8IKm2EITjA1oyZKdXK"  # your direct link
+    url = "https://drive.google.com/uc?export=download&id=13xdczmFe4fjf8r8IKm2EITjA1oyZKdXK"
     if not model_path.exists():
         print("Downloading model from", url)
         response = requests.get(url)
@@ -32,6 +33,7 @@ def load_model(model_path):
         with open(model_path, "wb") as f:
             f.write(response.content)
     return onnxruntime.InferenceSession(str(model_path))
+
 
 def draw_polygon_and_labels(image, masks, classes):
     defect_counts = defaultdict(int)
