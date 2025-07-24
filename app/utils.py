@@ -6,6 +6,7 @@ import onnxruntime
 from pathlib import Path
 from collections import defaultdict
 from datetime import datetime
+from ultralytics import YOLO 
 
 IM_SIZE = 640
 CLASSES = {
