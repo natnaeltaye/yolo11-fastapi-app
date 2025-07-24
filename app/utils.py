@@ -26,15 +26,20 @@ COLORS = {
 }
 
 def load_model(model_path):
-    url = "https://drive.google.com/uc?export=download&id=13xdczmFe4pnw8r8IKm2EITjA1oyZKdXK"
+    url = os.getenv("MODEL_URL")
+    if not url:
+        raise ValueError("MODEL_URL environment variable not set.")
+
     if not model_path.exists():
         print("Downloading model from", url)
         response = requests.get(url)
+        if response.status_code != 200:
+            raise RuntimeError(f"Failed to download model. Status code: {response.status_code}")
         model_path.parent.mkdir(parents=True, exist_ok=True)
         with open(model_path, "wb") as f:
             f.write(response.content)
-    return onnxruntime.InferenceSession(str(model_path))
 
+    return onnxruntime.InferenceSession(str(model_path))
 
 def draw_polygon_and_labels(image, masks, classes):
     defect_counts = defaultdict(int)
